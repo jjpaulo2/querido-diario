@@ -34,5 +34,8 @@ class RjArraialdoCabopider(BaseGazetteSpider):
                 power="executive",
             )
 
+        if publish_date < self.start_date:
+            return
+
         if next_page := response.xpath('//a[contains(@rel, "next")]/@href'):
             yield Request(next_page.extract_first(), callback=self.parse)
