@@ -18,9 +18,7 @@ class RjArraialdoCabopider(BaseGazetteSpider):
     def parse(self, response: HtmlResponse):
         for entry in response.css(".row .card.card-margin"):
             edition = entry.css("h5.card-title").re_first(r"(\d*) \/ \d{4}")
-            file_url = entry.css(
-                ".widget-49-meeting-action.mt-2 a::attr(href)"
-            ).extract_first()
+            file_url = entry.css(".widget-49-meeting-action.mt-2 a::attr(href)")
             publish_date = entry.css(".widget-49-date-day::text").extract_first()
             publish_date = datetime.strptime(publish_date, "%d %b %Y").date()
 
@@ -29,14 +27,12 @@ class RjArraialdoCabopider(BaseGazetteSpider):
 
             yield Gazette(
                 date=publish_date,
-                file_urls=[file_url],
+                file_urls=[file_url.extract_first()],
                 edition_number=edition,
                 is_extra_edition=False,
                 territory_id=self.TERRITORY_ID,
                 power="executive",
             )
 
-        if next_page := response.xpath(
-            '//a[contains(@rel, "next")]/@href'
-        ).extract_first():
-            yield Request(next_page, callback=self.parse)
+        if next_page := response.xpath('//a[contains(@rel, "next")]/@href'):
+            yield Request(next_page.extract_first(), callback=self.parse)
