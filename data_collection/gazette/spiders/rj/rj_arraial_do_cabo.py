@@ -13,7 +13,7 @@ class RjArraialdoCabopider(BaseGazetteSpider):
     name = "rj_arraial_do_cabo"
     allowed_domains = ["portal.arraial.rj.gov.br"]
     start_urls = ["https://portal.arraial.rj.gov.br/diarios_oficiais_web"]
-    start_date = date(2019, 5, 7)
+    start_date = date(2019, 4, 11)
 
     def parse(self, response: HtmlResponse):
         for entry in response.css(".row .card.card-margin"):
@@ -33,9 +33,6 @@ class RjArraialdoCabopider(BaseGazetteSpider):
                 territory_id=self.TERRITORY_ID,
                 power="executive",
             )
-
-        if publish_date < self.start_date:
-            return
 
         if next_page := response.xpath('//a[contains(@rel, "next")]/@href'):
             yield Request(next_page.extract_first(), callback=self.parse)
